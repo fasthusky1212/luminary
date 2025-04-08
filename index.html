@@ -1,15 +1,95 @@
-<div style="position: relative; width: 100%; max-width: 300px; margin: auto; overflow: hidden; border-radius: 8px;">
-  <div style="position: relative; width: 100%;">
-    <img src="https://static.wixstatic.com/media/feda1d_f5ff81ca6cae4dc6aa47b08184487d35~mv2.jpg/v1/fill/w_200,h_266,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/IMG_2818.jpg" alt="Before" style="width: 100%; display: block;" />
-    <div style="position: absolute; top: 0; left: 0; color: white; background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; font-size: 16px;">
-      Before Awesomeness
+<div style="max-width: 400px; margin: auto; position: relative;">
+  <style>
+    .img-comp-container {
+      position: relative;
+      height: auto;
+    }
+
+    .img-comp-img {
+      position: absolute;
+      width: auto;
+      height: auto;
+      overflow: hidden;
+    }
+
+    .img-comp-img img {
+      display: block;
+      vertical-align: middle;
+      width: 100%;
+    }
+
+    .img-comp-slider {
+      position: absolute;
+      z-index: 9;
+      cursor: ew-resize;
+      width: 40px;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.5);
+      border-left: 2px solid #000;
+      border-right: 2px solid #000;
+    }
+  </style>
+
+  <div class="img-comp-container" id="compareContainer">
+    <div class="img-comp-img">
+      <img src="https://static.wixstatic.com/media/feda1d_92ac6a9972734f12ab199ac521bf33fa~mv2.jpg/v1/fill/w_200,h_266,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/IMG_6330.jpg" alt="After">
     </div>
+    <div class="img-comp-img img-comp-overlay">
+      <img src="https://static.wixstatic.com/media/feda1d_f5ff81ca6cae4dc6aa47b08184487d35~mv2.jpg/v1/fill/w_200,h_266,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/IMG_2818.jpg" alt="Before">
+    </div>
+    <div class="img-comp-slider" id="slider"></div>
   </div>
 
-  <div style="position: relative; width: 100%; margin-top: 10px;">
-    <img src="https://static.wixstatic.com/media/feda1d_92ac6a9972734f12ab199ac521bf33fa~mv2.jpg/v1/fill/w_200,h_266,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/IMG_6330.jpg" alt="After" style="width: 100%; display: block;" />
-    <div style="position: absolute; top: 0; left: 0; color: white; background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; font-size: 16px;">
-      After Awesomeness
-    </div>
-  </div>
+  <script>
+    function initComparisons() {
+      var x = document.getElementsByClassName("img-comp-overlay");
+      for (var i = 0; i < x.length; i++) {
+        compareImages(x[i]);
+      }
+
+      function compareImages(img) {
+        var slider, clicked = 0, w, h;
+        w = img.offsetWidth;
+        h = img.offsetHeight;
+        img.style.width = (w / 2) + "px";
+
+        slider = document.getElementById("slider");
+        slider.style.top = 0;
+        slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
+
+        slider.addEventListener("mousedown", slideReady);
+        window.addEventListener("mouseup", slideFinish);
+        window.addEventListener("mousemove", slideMove);
+
+        function slideReady(e) {
+          e.preventDefault();
+          clicked = 1;
+        }
+
+        function slideFinish() {
+          clicked = 0;
+        }
+
+        function slideMove(e) {
+          if (clicked === 0) return false;
+          var pos = getCursorPos(e);
+          if (pos < 0) pos = 0;
+          if (pos > w) pos = w;
+          slide(pos);
+        }
+
+        function getCursorPos(e) {
+          var a = img.getBoundingClientRect();
+          return e.pageX - a.left - window.pageXOffset;
+        }
+
+        function slide(x) {
+          img.style.width = x + "px";
+          slider.style.left = img.offsetWidth - (slider.offsetWidth / 2) + "px";
+        }
+      }
+    }
+
+    window.onload = initComparisons;
+  </script>
 </div>
