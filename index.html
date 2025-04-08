@@ -1,95 +1,106 @@
-<div style="max-width: 400px; margin: auto; position: relative;">
+<div style="max-width: 500px; margin: auto; position: relative;">
   <style>
-    .img-comp-container {
+    .comparison-container {
       position: relative;
-      height: auto;
+      width: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
     }
 
-    .img-comp-img {
+    .comparison-container img {
+      width: 100%;
+      display: block;
+    }
+
+    .comparison-overlay {
       position: absolute;
-      width: auto;
-      height: auto;
+      top: 0;
+      left: 0;
+      width: 50%;
       overflow: hidden;
     }
 
-    .img-comp-img img {
+    .comparison-overlay img {
       display: block;
-      vertical-align: middle;
-      width: 100%;
     }
 
-    .img-comp-slider {
+    .comparison-slider {
       position: absolute;
-      z-index: 9;
-      cursor: ew-resize;
-      width: 40px;
+      top: 0;
+      left: 50%;
+      width: 3px;
       height: 100%;
-      background-color: rgba(255, 255, 255, 0.5);
+      background-color: #fff;
       border-left: 2px solid #000;
       border-right: 2px solid #000;
+      cursor: ew-resize;
+      z-index: 2;
+    }
+
+    .label-before,
+    .label-after {
+      position: absolute;
+      top: 10px;
+      padding: 5px 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      border-radius: 4px;
+      z-index: 3;
+    }
+
+    .label-before {
+      left: 10px;
+    }
+
+    .label-after {
+      right: 10px;
     }
   </style>
 
-  <div class="img-comp-container" id="compareContainer">
-    <div class="img-comp-img">
-      <img src="https://static.wixstatic.com/media/feda1d_92ac6a9972734f12ab199ac521bf33fa~mv2.jpg/v1/fill/w_200,h_266,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/IMG_6330.jpg" alt="After">
-    </div>
-    <div class="img-comp-img img-comp-overlay">
+  <div class="comparison-container" id="compareBox">
+    <span class="label-before">Before</span>
+    <span class="label-after">After</span>
+
+    <img src="https://static.wixstatic.com/media/feda1d_92ac6a9972734f12ab199ac521bf33fa~mv2.jpg/v1/fill/w_200,h_266,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/IMG_6330.jpg" alt="After">
+
+    <div class="comparison-overlay" id="overlay">
       <img src="https://static.wixstatic.com/media/feda1d_f5ff81ca6cae4dc6aa47b08184487d35~mv2.jpg/v1/fill/w_200,h_266,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/IMG_2818.jpg" alt="Before">
     </div>
-    <div class="img-comp-slider" id="slider"></div>
+
+    <div class="comparison-slider" id="slider"></div>
   </div>
 
   <script>
-    function initComparisons() {
-      var x = document.getElementsByClassName("img-comp-overlay");
-      for (var i = 0; i < x.length; i++) {
-        compareImages(x[i]);
-      }
+    const container = document.getElementById("compareBox");
+    const overlay = document.getElementById("overlay");
+    const slider = document.getElementById("slider");
 
-      function compareImages(img) {
-        var slider, clicked = 0, w, h;
-        w = img.offsetWidth;
-        h = img.offsetHeight;
-        img.style.width = (w / 2) + "px";
+    let isDragging = false;
 
-        slider = document.getElementById("slider");
-        slider.style.top = 0;
-        slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
+    container.addEventListener("mousedown", function () {
+      isDragging = true;
+    });
 
-        slider.addEventListener("mousedown", slideReady);
-        window.addEventListener("mouseup", slideFinish);
-        window.addEventListener("mousemove", slideMove);
+    window.addEventListener("mouseup", function () {
+      isDragging = false;
+    });
 
-        function slideReady(e) {
-          e.preventDefault();
-          clicked = 1;
-        }
+    window.addEventListener("mousemove", function (e) {
+      if (!isDragging) return;
 
-        function slideFinish() {
-          clicked = 0;
-        }
+      const rect = container.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      if (x < 0) x = 0;
+      if (x > rect.width) x = rect.width;
 
-        function slideMove(e) {
-          if (clicked === 0) return false;
-          var pos = getCursorPos(e);
-          if (pos < 0) pos = 0;
-          if (pos > w) pos = w;
-          slide(pos);
-        }
+      overlay.style.width = x + "px";
+      slider.style.left = x + "px";
+    });
 
-        function getCursorPos(e) {
-          var a = img.getBoundingClientRect();
-          return e.pageX - a.left - window.pageXOffset;
-        }
-
-        function slide(x) {
-          img.style.width = x + "px";
-          slider.style.left = img.offsetWidth - (slider.offsetWidth / 2) + "px";
-        }
-      }
-    }
-
-    window.onload = initComparisons;
+    // Set initial position
+    overlay.style.width = "50%";
+    slider.style.left = "50%";
   </script>
 </div>
